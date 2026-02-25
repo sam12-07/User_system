@@ -31,7 +31,7 @@ $_SESSION['department'] = $user['department']; // Save department for HOD access
                 header("Location: principal_dashboard.php");
                 exit();
             } else if ($user['role_id'] === '2') {
-                header("Location: add_questions.php");
+                header("Location: lecturer_dashboard.php");
                 exit();
             } else if ($user['role_id'] === '3') {
                 header("Location: hod_dashboard.php");

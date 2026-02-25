@@ -1,24 +1,11 @@
 <?php
 session_start();
-include 'db.php';
 
-// Check if lecturer is logged in
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 2) {
+// Optional: Role check (remove if already handled elsewhere)
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 2) {
     header("Location: login.php");
     exit();
 }
-
-// Get Lecturer ID from session
-$lecturer_id = $_SESSION['user_id'];
-
-// Fetch assigned subject for the lecturer
-$subject_query = "SELECT subjects.id, subjects.subject_name FROM subjects 
-                  JOIN users ON subjects.id = users.subject_id 
-                  WHERE users.id = ?";
-$stmt = $conn->prepare($subject_query);
-$stmt->bind_param("i", $lecturer_id);
-$stmt->execute();
-$subject_result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +16,6 @@ $subject_result = $stmt->get_result();
 <title>Lecturer Dashboard</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <style>
     body {
@@ -37,14 +23,14 @@ $subject_result = $stmt->get_result();
         padding: 0;
         font-family: 'Poppins', sans-serif;
         background: linear-gradient(135deg, #667eea, #764ba2);
-        min-height: 100vh;
+        height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
     }
 
     .glass-card {
-        width: 450px;
+        width: 420px;
         padding: 40px;
         border-radius: 20px;
         background: rgba(255, 255, 255, 0.15);
@@ -58,28 +44,15 @@ $subject_result = $stmt->get_result();
     }
 
     .glass-card h2 {
-        font-weight: 600;
         margin-bottom: 30px;
+        font-weight: 600;
         letter-spacing: 1px;
     }
 
-    .form-select {
-        border-radius: 10px;
-        padding: 12px;
-        font-size: 15px;
-        border: none;
-        outline: none;
-        color: black; /* FIXED DROPDOWN TEXT COLOR */
-    }
-
-    .form-select option {
-        color: black;
-    }
-
     .btn-custom {
-        margin-top: 20px;
         width: 100%;
         padding: 12px;
+        margin: 10px 0;
         border-radius: 30px;
         border: none;
         font-weight: 600;
@@ -94,11 +67,19 @@ $subject_result = $stmt->get_result();
         box-shadow: 0 10px 20px rgba(0,0,0,0.3);
     }
 
-    .btn-custom:disabled {
-        background: #999;
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
+    .logout-btn {
+        margin-top: 15px;
+        font-size: 14px;
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.4);
+        color: white;
+        border-radius: 20px;
+        padding: 8px 15px;
+        transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+        background: rgba(255,255,255,0.2);
     }
 
     @keyframes fadeIn {
@@ -106,10 +87,10 @@ $subject_result = $stmt->get_result();
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .footer-text {
-        margin-top: 25px;
-        font-size: 13px;
+    .welcome-text {
+        font-size: 14px;
         opacity: 0.8;
+        margin-bottom: 20px;
     }
 </style>
 </head>
@@ -119,39 +100,30 @@ $subject_result = $stmt->get_result();
 <div class="glass-card">
     <h2>Lecturer Dashboard</h2>
 
-    <!-- Subject Selection -->
-    <select class="form-select" id="subject">
-        <option value="">Select Subject</option>
-        <?php while ($subject = $subject_result->fetch_assoc()) { ?>
-            <option value="<?= $subject['id'] ?>">
-                <?= $subject['subject_name'] ?>
-            </option>
-        <?php } ?>
-    </select>
-
-    <button id="manageQuestions" class="btn-custom" disabled>
-        Manage Questions
-    </button>
-
-    <div class="footer-text">
-        Select your assigned subject to continue
+    <div class="welcome-text">
+        Welcome, Lecturer 👋
     </div>
+
+    <!-- Add Question Button -->
+    <a href="add_questions.php">
+        <button class="btn-custom">Add Questions</button>
+    </a>
+
+    <!-- View Questions Button -->
+    <a href="view_questions.php">
+        <button class="btn-custom">View Questions</button>
+    </a>
+
+    <!-- View Results Button -->
+    <a href="view_results.php">
+        <button class="btn-custom">View Results</button>
+    </a>
+
+    <!-- Logout Button -->
+    <a href="logout.php">
+        <button class="logout-btn">Logout</button>
+    </a>
 </div>
-
-<script>
-$(document).ready(function(){
-    $("#subject").change(function(){
-        $("#manageQuestions").prop("disabled", !$(this).val());
-    });
-
-    $("#manageQuestions").click(function(){
-        let subject_id = $("#subject").val();
-        if(subject_id) {
-            window.location.href = "add_questions.php?subject_id=" + subject_id;
-        }
-    });
-});
-</script>
 
 </body>
 </html>
