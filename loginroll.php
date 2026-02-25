@@ -1,5 +1,5 @@
 <?php
-include 'db.php'; // Include database connection
+include 'db.php'; // Include database c
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = $_POST['role'];
