@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Optional: Role check (remove if already handled elsewhere)
+// Optional: Role check (remove if already handled els
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 2) {
     header("Location: login.php");
     exit();
